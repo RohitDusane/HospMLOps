@@ -1,0 +1,152 @@
+##################################
+# Project-specific exclusions
+##################################
+
+# ML artifacts & generated outputs
+artifacts/
+logs/
+synthetic_generation/
+Clinical_Readmission.egg-info/
+
+
+# Data (raw, processed, interim)
+data/
+
+# Non-source src directory (generated or intermediate)
+src/
+
+# Configuration generated per environment
+config/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Package metadata
+Clinical_Readmission.egg-info/
+*.egg-info/
+
+# Generated reports / UI artifacts
+project_code.html
+tabs.html
+
+# Standalone scripts (not part of production)
+demo.py
+test.py
+
+# Ignore experimental / comparison components
+readmit/components/baseline_comparison.py
+readmit/components/baseline_EDA_compare.py
+readmit/components/category_transformer.py
+readmit/components/data_transformation.py
+readmit/components/data_preprocessing.py
+readmit/components/eda.py
+readmit/components/feat_engg.py
+readmit/components/stats.py
+readmit/components/nan.py
+readmit/components/prod_model.py
+readmit/components/models.py
+
+##################################
+# Standard Python ignores
+##################################
+
+# Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Builds & distributions
+build/
+dist/
+.eggs/
+*.egg
+pip-wheel-metadata/
+
+# Testing & coverage
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+nosetests.xml
+
+# Type checking
+.mypy_cache/
+.pyre/
+.pytype/
+
+# Jupyter
+.ipynb_checkpoints/
+
+
+##################################
+# ML / Data Science specific
+##################################
+
+# Model checkpoints
+*.pkl
+*.joblib
+*.h5
+*.onnx
+*.pt
+*.ckpt
+
+# Experiment tracking
+mlruns/
+wandb/
+tensorboard/
+tb_logs/
+report.md
+
+# DVC (if not using remote tracking)
+.dvc/tmp/
+
+
+##################################
+# Production & CI/CD safety
+##################################
+
+# Environment variables & secrets
+.env
+.env.*
+*.key
+*.pem
+*.crt
+secrets.yml
+secrets.yaml
+
+# Logs
+*.log
+
+
+##################################
+# OS & Editor
+##################################
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+*.bak
+
+
+##################################
+# Archives & temp
+##################################
+
+*.zip
+*.tar
+*.tar.gz
+*.rar
+tmp/
+temp/
