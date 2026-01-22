@@ -1,11 +1,14 @@
 # Add patterns of files dvc should ignore, which could improve
 # the performance. Learn more at
 # https://dvc.org/doc/user-guide/dvcignore
-
 # Ignore everything by default
 *
 
-# Except these folders in artifacts/data
+# Un-ignore parent directories
+!artifacts/
+!artifacts/data/
+
+# Track only these folders
 !artifacts/data/raw/
 !artifacts/data/processed/
 !artifacts/data/validated/
