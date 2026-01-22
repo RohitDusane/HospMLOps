@@ -1,5 +1,0 @@
-[core]
-    remote = gcs_storage
-['remote "gcs_storage"']
-    url = gs://${PROJECT_ID}-dvc-data/dvcstore
-    credentialpath = ../mlops-sa-key.json
