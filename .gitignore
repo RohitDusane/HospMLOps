@@ -17,7 +17,7 @@ Clinical_Readmission.egg-info/
 !*.dvc
 
 # Track only data folders we want
-!artifacts/data/
+!artifacts/data/raw/
 !artifacts/data/processed/
 !artifacts/data/validated/
 !artifacts/data/transformed/
