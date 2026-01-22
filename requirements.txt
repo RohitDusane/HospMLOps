@@ -24,3 +24,7 @@ sdv
 mlflow
 lightgbm
 xgboost
+dvc[gdrive,gs]
+dagshub
+dvc
+dvc-s3

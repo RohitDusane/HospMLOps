@@ -10,7 +10,18 @@ Clinical_Readmission.egg-info/
 
 
 # Data (raw, processed, interim)
-data/
+# Ignore everything by default
+*
+
+# Track only .dvc files
+!*.dvc
+
+# Track only data folders we want
+!artifacts/data/
+!artifacts/data/processed/
+!artifacts/data/validated/
+!artifacts/data/transformed/
+
 
 # Non-source src directory (generated or intermediate)
 src/

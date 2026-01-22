@@ -742,90 +742,151 @@ class ModelTrainer:
 
         return comparison_df
 
+# ==========================================================================
+# MAIN EXECUTION (OPTIMIZED)
+# ==========================================================================
+if __name__ == "main":
+    start = time.time()
+    logging.info("="*70)
+    logging.info("🚀 STARTING MODEL TRAINING PIPELINE")
+    logging.info("="*70)
+    try:
+        trainer = ModelTrainer(experiment_name="hospital_readmission_v8_optimized")
+        
+        # ===== SCENARIO 1: Real → Real =====
+        logging.info("\n" + "="*70)
+        logging.info("📊 SCENARIO 1: Real Train → Real Test")
+        logging.info("="*70 + "\n")
+        
+        X_train_real, X_test_real, y_train_real, y_test_real = trainer.load_data(
+            train_path=paths_config.TRANSFORMED_REAL_TRAIN,
+            test_path=paths_config.TRANSFORMED_REAL_TEST,
+            target_col="readmitted_bin"
+        )
+        
+        results_real = trainer.train_all_models(
+            X_train_real, y_train_real, 
+            X_test_real, y_test_real, 
+            scenario="real_to_real",
+            do_hyperparam_tuning=True,
+            n_jobs=1  # ✅ Sequential to avoid nested parallelism
+        )
+        
+        comparison_real = trainer.compare_models(results_real, "real_to_real")
+        
+        print("\n" + "="*70)
+        print("📊 REAL → REAL RESULTS:")
+        print("="*70)
+        print(comparison_real.to_string(index=False))
+        print("="*70 + "\n")
+        
+        # ===== OPTIONAL: Add other scenarios here =====
+        # Uncomment if you want to train on synthetic data
+        
+        # ===== FINAL SUMMARY =====
+        elapsed = round(time.time() - start, 2)
+        
+        print("\n" + "="*70)
+        print("✅ MODEL TRAINING COMPLETED SUCCESSFULLY")
+        print("="*70)
+        print(f"⏱️  Total time: {elapsed}s ({elapsed/60:.1f} minutes)")
+        print(f"📊 Models trained: {len(results_real)}")
+        print(f"🏆 Best model: {comparison_real.iloc[0]['Model']}")
+        print(f"📈 Best ROC-AUC: {comparison_real.iloc[0]['Test ROC-AUC']:.4f}")
+        print("="*70)
+        print("\n💡 Check MLflow UI for detailed tracking:")
+        print("   mlflow ui --port 5000")
+        print("="*70 + "\n")
+        
+        logging.info(f"✅ PIPELINE COMPLETE | duration={elapsed}s | status=SUCCESS")
+        
+    except Exception as e:
+        logging.error("❌ PIPELINE FAILED", exc_info=True)
+        raise CustomException(e, sys)
 
     
 # ==========================================================================
 # MAIN EXECUTION
 # ==========================================================================
 
-if __name__ == "__main__":
-    start = time.time()
-    logging.info("STAGE_START | name=MODEL_TRAINING")
+# if __name__ == "__main__":
+#     start = time.time()
+#     logging.info("STAGE_START | name=MODEL_TRAINING")
     
-    try:
-        trainer = ModelTrainer(experiment_name="hospital_readmission_v7")
+#     try:
+#         trainer = ModelTrainer(experiment_name="hospital_readmission_v7")
         
-        # ===== SCENARIO 1: Real → Real =====
-        logging.info("="*70)
-        logging.info("SCENARIO 1: Real Train → Real Test")
-        logging.info("="*70)
+#         # ===== SCENARIO 1: Real → Real =====
+#         logging.info("="*70)
+#         logging.info("SCENARIO 1: Real Train → Real Test")
+#         logging.info("="*70)
         
-        X_train_real, X_test_real, y_train_real, y_test_real = trainer.load_data(
-            train_path=paths_config.TRANSFORMED_REAL_TRAIN,
-            test_path=paths_config.TRANSFORMED_REAL_TEST,
-            target_col="readmitted_bin")
+#         X_train_real, X_test_real, y_train_real, y_test_real = trainer.load_data(
+#             train_path=paths_config.TRANSFORMED_REAL_TRAIN,
+#             test_path=paths_config.TRANSFORMED_REAL_TEST,
+#             target_col="readmitted_bin")
         
-        results_real = trainer.train_all_models(
-            X_train_real, y_train_real, X_test_real, y_test_real, 
-            scenario="real_to_real",
-            do_hyperparam_tuning=True
-        )
+#         results_real = trainer.train_all_models(
+#             X_train_real, y_train_real, X_test_real, y_test_real, 
+#             scenario="real_to_real",
+#             do_hyperparam_tuning=True
+#         )
         
-        comparison_real = trainer.compare_models(results_real, "real_to_real")
-        print("\nReal → Real Results:")
-        print(comparison_real.to_string(index=False))
+#         comparison_real = trainer.compare_models(results_real, "real_to_real")
+#         print("\nReal → Real Results:")
+#         print(comparison_real.to_string(index=False))
         
-        # ===== SCENARIO 2: Synthetic → Synthetic =====
-        # logging.info("="*70)
-        # logging.info("SCENARIO 2: Synthetic Train → Synthetic Test")
-        # logging.info("="*70)
+#         # ===== SCENARIO 2: Synthetic → Synthetic =====
+#         # logging.info("="*70)
+#         # logging.info("SCENARIO 2: Synthetic Train → Synthetic Test")
+#         # logging.info("="*70)
         
-        # X_train_syn, X_test_syn, y_train_syn, y_test_syn = trainer.load_data(
-        #     train_path=paths_config.TRANSFORMED_SYN_TRAIN,
-        #     test_path=paths_config.TRANSFORMED_SYN_TEST,
-        #     target_col="readmitted_bin")
+#         # X_train_syn, X_test_syn, y_train_syn, y_test_syn = trainer.load_data(
+#         #     train_path=paths_config.TRANSFORMED_SYN_TRAIN,
+#         #     test_path=paths_config.TRANSFORMED_SYN_TEST,
+#         #     target_col="readmitted_bin")
         
-        # results_syn = trainer.train_all_models(
-        #     X_train_syn, y_train_syn, X_test_syn, y_test_syn, 
-        #     scenario="synthetic_to_synthetic"
-        # )
+#         # results_syn = trainer.train_all_models(
+#         #     X_train_syn, y_train_syn, X_test_syn, y_test_syn, 
+#         #     scenario="synthetic_to_synthetic"
+#         # )
         
-        # comparison_syn = trainer.compare_models(results_syn, "synthetic_to_synthetic")
-        # print("\nSynthetic → Synthetic Results:")
-        # print(comparison_syn.to_string(index=False))
+#         # comparison_syn = trainer.compare_models(results_syn, "synthetic_to_synthetic")
+#         # print("\nSynthetic → Synthetic Results:")
+#         # print(comparison_syn.to_string(index=False))
         
-        # # ===== SCENARIO 3: Synthetic → Real (MOST IMPORTANT) =====
-        # logging.info("="*70)
-        # logging.info("SCENARIO 3: Synthetic Train → Real Test (UTILITY TEST)")
-        # logging.info("="*70)
+#         # # ===== SCENARIO 3: Synthetic → Real (MOST IMPORTANT) =====
+#         # logging.info("="*70)
+#         # logging.info("SCENARIO 3: Synthetic Train → Real Test (UTILITY TEST)")
+#         # logging.info("="*70)
         
-        # results_syn_to_real = trainer.train_all_models(
-        #     X_train_syn, y_train_syn, X_test_real, y_test_real, 
-        #     scenario="synthetic_to_real")
+#         # results_syn_to_real = trainer.train_all_models(
+#         #     X_train_syn, y_train_syn, X_test_real, y_test_real, 
+#         #     scenario="synthetic_to_real")
         
-        # comparison_syn_to_real = trainer.compare_models(results_syn_to_real, "synthetic_to_real")
-        # print("\nSynthetic → Real Results (UTILITY):")
-        # print(comparison_syn_to_real.to_string(index=False))
+#         # comparison_syn_to_real = trainer.compare_models(results_syn_to_real, "synthetic_to_real")
+#         # print("\nSynthetic → Real Results (UTILITY):")
+#         # print(comparison_syn_to_real.to_string(index=False))
         
-        # ===== SUMMARY =====
-        elapsed = round(time.time() - start, 2)
-        logging.info("="*70)
-        logging.info("TRAINING SUMMARY")
-        logging.info("="*70)
-        logging.info("Total time: %ss", elapsed)
-        logging.info("Scenarios completed: 3")
-        logging.info("Models per scenario: %d", len(results_real))
-        logging.info("="*70)
+#         # ===== SUMMARY =====
+#         elapsed = round(time.time() - start, 2)
+#         logging.info("="*70)
+#         logging.info("TRAINING SUMMARY")
+#         logging.info("="*70)
+#         logging.info("Total time: %ss", elapsed)
+#         logging.info("Scenarios completed: 3")
+#         logging.info("Models per scenario: %d", len(results_real))
+#         logging.info("="*70)
         
-        logging.info("STAGE_END | name=MODEL_TRAINING | status=SUCCESS | duration=%ss", elapsed)
+#         logging.info("STAGE_END | name=MODEL_TRAINING | status=SUCCESS | duration=%ss", elapsed)
         
-        print("\n" + "="*70)
-        print("MODEL TRAINING COMPLETED SUCCESSFULLY")
-        print("="*70)
-        print(f"Time taken: {elapsed}s")
-        print(f"Check MLflow UI for detailed tracking")
-        print("="*70)
+#         print("\n" + "="*70)
+#         print("MODEL TRAINING COMPLETED SUCCESSFULLY")
+#         print("="*70)
+#         print(f"Time taken: {elapsed}s")
+#         print(f"Check MLflow UI for detailed tracking")
+#         print("="*70)
         
-    except Exception as e:
-        logging.error("STAGE_END | name=MODEL_TRAINING | status=FAILED", exc_info=True)
-        raise CustomException(e, sys)
+#     except Exception as e:
+#         logging.error("STAGE_END | name=MODEL_TRAINING | status=FAILED", exc_info=True)
+#         raise CustomException(e, sys)
