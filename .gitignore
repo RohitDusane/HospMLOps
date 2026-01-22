@@ -14,17 +14,6 @@ artifacts/**
 !artifacts/**/*.dvc
 
 # Data (raw, processed, interim)
-# Ignore everything by default
-*
-
-# Track only .dvc files
-!*.dvc
-
-# Track only data folders we want
-!artifacts/data/raw/
-!artifacts/data/processed/
-!artifacts/data/validated/
-!artifacts/data/transformed/
 
 
 # Non-source src directory (generated or intermediate)
