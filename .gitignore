@@ -8,7 +8,7 @@ synthetic_generation/
 Clinical_Readmission.egg-info/
 
 # Ignore all artifacts by default
-artifacts/**
+# artifacts/**
 
 # But allow DVC metadata and data folders we track
 !artifacts/**/*.dvc
