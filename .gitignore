@@ -8,15 +8,31 @@ synthetic_generation/
 Clinical_Readmission.egg-info/
 
 # Ignore all artifacts except DVC-tracked data
+# Ignore all artifacts by default
 artifacts/**
-!artifacts/data/
-!artifacts/data/**/*.dvc
 
-# Track only DVC metadata files inside artifacts/data
-!artifacts/data/raw.dvc
-!artifacts/data/processed.dvc
-!artifacts/data/validated.dvc
-!artifacts/data/transformed.dvc
+# But allow DVC metadata files inside artifacts/data
+!artifacts/data/**/*.dvc
+!artifacts/data/
+
+# Track DVC metadata at the project root
+!.dvc/config
+!.dvcignore
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Logs, temp, and reports
+*.log
+tmp/
+temp/
 
 
 # Non-source src directory (generated or intermediate)
