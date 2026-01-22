@@ -7,12 +7,16 @@ logs/
 synthetic_generation/
 Clinical_Readmission.egg-info/
 
-
+# Ignore all artifacts except DVC-tracked data
+artifacts/**
 !artifacts/data/
-# But allow DVC metadata files
-!artifacts/**/*.dvc
+!artifacts/data/**/*.dvc
 
-# Data (raw, processed, interim)
+# Track only DVC metadata files inside artifacts/data
+!artifacts/data/raw.dvc
+!artifacts/data/processed.dvc
+!artifacts/data/validated.dvc
+!artifacts/data/transformed.dvc
 
 
 # Non-source src directory (generated or intermediate)
