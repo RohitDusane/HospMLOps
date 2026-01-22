@@ -12,7 +12,7 @@ Clinical_Readmission.egg-info/
 artifacts/**
 
 # But allow DVC metadata files inside artifacts/data
-!artifacts/data/**/*.dvc
+!artifacts/**/*.dvc
 !artifacts/data/
 
 # Track DVC metadata at the project root
