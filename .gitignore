@@ -1,22 +1,14 @@
-##################################
-# Project-specific exclusions
-##################################
-
 # ML artifacts & generated outputs
 logs/
 synthetic_generation/
 Clinical_Readmission.egg-info/
 
 # Ignore all artifacts by default
-# artifacts/**
+artifacts/**
 
-# But allow DVC metadata and data folders we track
+# But allow DVC-tracked data and metadata
 !artifacts/**/*.dvc
 !artifacts/data/
-!artifacts/data/raw/
-!artifacts/data/processed/
-!artifacts/data/validated/
-!artifacts/data/transformed/
 
 # Track DVC project config
 !.dvc/config
@@ -37,7 +29,7 @@ __pycache__/
 tmp/
 temp/
 
-# Non-source src directory (generated or intermediate)
+# Non-source src directory
 src/
 
 # Configuration generated per environment
@@ -51,79 +43,45 @@ Clinical_Readmission.egg-info/
 project_code.html
 tabs.html
 
-# Standalone scripts (not part of production)
+# Standalone scripts
 demo.py
 test.py
 
 # Ignore experimental / comparison components
-readmit/components/baseline_comparison.py
-readmit/components/baseline_EDA_compare.py
-readmit/components/category_transformer.py
-readmit/components/data_transformation.py
-readmit/components/data_preprocessing.py
-readmit/components/eda.py
-readmit/components/feat_engg.py
-readmit/components/stats.py
-readmit/components/nan.py
-readmit/components/prod_model.py
-readmit/components/models.py
+readmit/components/*.py
 
-##################################
 # Standard Python ignores
-##################################
-
-# Builds & distributions
 build/
 dist/
 .eggs/
-*.egg
 pip-wheel-metadata/
-
-# Testing & coverage
 .pytest_cache/
 .tox/
 .nox/
-.coverage
-.coverage.*
+.coverage*
 htmlcov/
 coverage.xml
 nosetests.xml
-
-# Type checking
 .mypy_cache/
 .pyre/
 .pytype/
-
-# Jupyter
 .ipynb_checkpoints/
 
-##################################
-# ML / Data Science specific
-##################################
-
-# Model checkpoints
+# ML/Data-specific ignores
 *.pkl
 *.joblib
 *.h5
 *.onnx
 *.pt
 *.ckpt
-
-# Experiment tracking
 mlruns/
 wandb/
 tensorboard/
 tb_logs/
 report.md
-
-# DVC (if not using remote tracking)
 .dvc/tmp/
 
-##################################
-# Production & CI/CD safety
-##################################
-
-# Environment variables & secrets
+# Secrets & environment variables
 .env
 .env.* 
 *.key
@@ -132,10 +90,7 @@ report.md
 secrets.yml
 secrets.yaml
 
-##################################
-# OS & Editor
-##################################
-
+# OS & editor files
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -146,13 +101,8 @@ desktop.ini
 *.tmp
 *.bak
 
-##################################
-# Archives & temp
-##################################
-
+# Archives
 *.zip
 *.tar
 *.tar.gz
 *.rar
-tmp/
-temp/

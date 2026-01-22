@@ -1,11 +1,11 @@
 # Ignore everything by default
 *
 
-# Un-ignore parent directories
+# Un-ignore parent folders
 !artifacts/
 !artifacts/data/
 
-# Track only these folders
+# Track only these data folders
 !artifacts/data/raw/
 !artifacts/data/processed/
 !artifacts/data/validated/
