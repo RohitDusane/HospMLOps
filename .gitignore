@@ -3,11 +3,15 @@
 ##################################
 
 # ML artifacts & generated outputs
-artifacts/
 logs/
 synthetic_generation/
 Clinical_Readmission.egg-info/
 
+# Ignore all artifacts contents
+artifacts/**
+
+# But allow DVC metadata files
+!artifacts/**/*.dvc
 
 # Data (raw, processed, interim)
 # Ignore everything by default
