@@ -1,11 +1,7 @@
 # Ignore everything by default
 *
 
-# Un-ignore artifacts and data
-!artifacts/
-!artifacts/data/
-
-# Track only these folders
+# Un-ignore only the data folders we want DVC to track
 !artifacts/data/raw/
 !artifacts/data/processed/
 !artifacts/data/validated/

@@ -7,15 +7,18 @@ logs/
 synthetic_generation/
 Clinical_Readmission.egg-info/
 
-# Ignore all artifacts except DVC-tracked data
 # Ignore all artifacts by default
 artifacts/**
 
-# But allow DVC metadata files inside artifacts/data
+# But allow DVC metadata and data folders we track
 !artifacts/**/*.dvc
 !artifacts/data/
+!artifacts/data/raw/
+!artifacts/data/processed/
+!artifacts/data/validated/
+!artifacts/data/transformed/
 
-# Track DVC metadata at the project root
+# Track DVC project config
 !.dvc/config
 !.dvcignore
 
@@ -34,18 +37,11 @@ __pycache__/
 tmp/
 temp/
 
-
 # Non-source src directory (generated or intermediate)
 src/
 
 # Configuration generated per environment
 config/
-
-# Virtual environments
-venv/
-.venv/
-env/
-ENV/
 
 # Package metadata
 Clinical_Readmission.egg-info/
@@ -76,11 +72,6 @@ readmit/components/models.py
 # Standard Python ignores
 ##################################
 
-# Bytecode
-__pycache__/
-*.py[cod]
-*$py.class
-
 # Builds & distributions
 build/
 dist/
@@ -106,7 +97,6 @@ nosetests.xml
 # Jupyter
 .ipynb_checkpoints/
 
-
 ##################################
 # ML / Data Science specific
 ##################################
@@ -129,23 +119,18 @@ report.md
 # DVC (if not using remote tracking)
 .dvc/tmp/
 
-
 ##################################
 # Production & CI/CD safety
 ##################################
 
 # Environment variables & secrets
 .env
-.env.*
+.env.* 
 *.key
 *.pem
 *.crt
 secrets.yml
 secrets.yaml
-
-# Logs
-*.log
-
 
 ##################################
 # OS & Editor
@@ -154,14 +139,12 @@ secrets.yaml
 .DS_Store
 Thumbs.db
 desktop.ini
-
 .vscode/
 .idea/
 *.swp
 *.swo
 *.tmp
 *.bak
-
 
 ##################################
 # Archives & temp
