@@ -1,10 +1,9 @@
-# Ignore everything
+# ignore everything else
 *
 
-# Un-ignore these folders and their files recursively
-!artifacts/
-!artifacts/data/
-!artifacts/data/raw/**
-!artifacts/data/processed/**
-!artifacts/data/validated/**
-!artifacts/data/transformed/**
+# except these data folders
+!ARTIFACTS/data/raw/
+!ARTIFACTS/data/processed/
+!ARTIFACTS/data/transformed/
+!ARTIFACTS/data/validated/
+
