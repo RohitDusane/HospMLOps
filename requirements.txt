@@ -28,3 +28,4 @@ dvc[gdrive,gs]
 dagshub
 dvc
 dvc-s3
+gsutil
