@@ -1,12 +1,6 @@
-# Ignore everything by default
-*
-
-# Un-ignore parent folders
-!artifacts/
-!artifacts/data/
-
-# Track only these data folders
-!artifacts/data/raw/
-!artifacts/data/processed/
-!artifacts/data/validated/
-!artifacts/data/transformed/
+# Ignore everything except DVC-tracked data
+*.csv
+!artifacts/data/raw/**
+!artifacts/data/processed/**
+!artifacts/data/validated/**
+!artifacts/data/transformed/**
