@@ -3,12 +3,17 @@ logs/
 synthetic_generation/
 Clinical_Readmission.egg-info/
 
-# Ignore all artifacts by default
+# Ignore artifacts by default
 artifacts/**
 
-# But allow DVC-tracked data and metadata
-!artifacts/**/*.dvc
+# Re-allow directory traversal
+!artifacts/
 !artifacts/data/
+!artifacts/data/**
+
+# Allow DVC metadata
+!artifacts/**/*.dvc
+
 
 # Track DVC project config
 !.dvc/config
