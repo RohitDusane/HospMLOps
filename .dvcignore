@@ -1,6 +1,7 @@
-# Ignore everything except DVC-tracked data
-*.csv
-!artifacts/data/raw/**
-!artifacts/data/processed/**
-!artifacts/data/validated/**
-!artifacts/data/transformed/**
+# .dvcignore
+*
+!.gitignore
+!artifacts/data/raw/
+!artifacts/data/processed/
+!artifacts/data/validated/
+!artifacts/data/transformed/
