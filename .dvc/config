@@ -1,0 +1,4 @@
+[core]
+    remote = gcs_storage
+['remote "gcs_storage"']
+    url = gs://hospital-readmission-ml-dvc-data
