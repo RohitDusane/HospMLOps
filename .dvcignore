@@ -1,9 +1,12 @@
 # ignore everything else
 *
 
-# except these data folders
+# except these data folders and their contents
 !ARTIFACTS/data/raw/
+!ARTIFACTS/data/raw/**
 !ARTIFACTS/data/processed/
+!ARTIFACTS/data/processed/**
 !ARTIFACTS/data/transformed/
+!ARTIFACTS/data/transformed/**
 !ARTIFACTS/data/validated/
-
+!ARTIFACTS/data/validated/**
