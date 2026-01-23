@@ -1,5 +1,5 @@
 [core]
     remote = gcs_storage
 ['remote "gcs_storage"']
-    url = gs://hospital-readmission-ml-dvc-data
+    url = gs://hospital-readmission-ml-dvc-data/dvcstore
     credentialpath = F:\_DataScienc_KNaik\Course_Projects\SurvivalAnalysis\early_readmission_predicton\mlops-sa-key.json
