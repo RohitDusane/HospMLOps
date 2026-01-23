@@ -1,64 +1,85 @@
+# ===============================
+# DVC / Artifacts (IMPORTANT)
+# ===============================
+
+# Ignore everything under artifacts by default
+artifacts/**
+
+# Re-allow directory traversal (CRITICAL)
+!artifacts/
+!artifacts/**/
+
+# Allow only DVC-tracked data and metadata
+!artifacts/data/**
+!artifacts/**/*.dvc
+
+# ===============================
+# DVC config
+# ===============================
+!.dvc/
+!.dvc/config
+!.dvcignore
+
+# ===============================
 # ML artifacts & generated outputs
+# ===============================
 logs/
 synthetic_generation/
 Clinical_Readmission.egg-info/
 
-# Ignore artifacts by default
-artifacts/**
-
-# Re-allow directory traversal
-!artifacts/
-!artifacts/data/
-!artifacts/data/**
-
-# Allow DVC metadata
-!artifacts/**/*.dvc
-
-
-# Track DVC project config
-!.dvc/config
-!.dvcignore
-
+# ===============================
 # Virtual environments
+# ===============================
 venv/
 .venv/
 env/
 ENV/
 
-# Python bytecode
+# ===============================
+# Python
+# ===============================
 __pycache__/
 *.py[cod]
 
-# Logs, temp, and reports
+# ===============================
+# Logs & temp
+# ===============================
 *.log
 tmp/
 temp/
 
+# ===============================
 # Non-source src directory
+# ===============================
 src/
 
-# Configuration generated per environment
+# ===============================
+# Config
+# ===============================
 config/
 
-# Package metadata
-Clinical_Readmission.egg-info/
+# ===============================
+# Python packaging
+# ===============================
 *.egg-info/
-
-# Generated reports / UI artifacts
-project_code.html
-tabs.html
-
-# Standalone scripts
-demo.py
-test.py
-
-# Ignore experimental / comparison components
-readmit/components/*.py
-
-# Standard Python ignores
 build/
 dist/
 .eggs/
+
+# ===============================
+# Reports / UI
+# ===============================
+project_code.html
+tabs.html
+
+# ===============================
+# Experimental code
+# ===============================
+readmit/components/*.py
+
+# ===============================
+# Python tooling
+# ===============================
 pip-wheel-metadata/
 .pytest_cache/
 .tox/
@@ -72,7 +93,9 @@ nosetests.xml
 .pytype/
 .ipynb_checkpoints/
 
-# ML/Data-specific ignores
+# ===============================
+# ML artifacts (never in Git)
+# ===============================
 *.pkl
 *.joblib
 *.h5
@@ -86,16 +109,21 @@ tb_logs/
 report.md
 .dvc/tmp/
 
-# Secrets & environment variables
+# ===============================
+# Secrets
+# ===============================
 .env
-.env.* 
+.env.*
 *.key
 *.pem
 *.crt
 secrets.yml
 secrets.yaml
+mlops-sa-key.json
 
-# OS & editor files
+# ===============================
+# OS / Editor
+# ===============================
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -106,9 +134,10 @@ desktop.ini
 *.tmp
 *.bak
 
+# ===============================
 # Archives
+# ===============================
 *.zip
 *.tar
 *.tar.gz
 *.rar
-mlops-sa-key.json
