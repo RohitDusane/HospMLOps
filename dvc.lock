@@ -1,0 +1,283 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python readmit/components/data_ingestion.py
+    deps:
+    - path: artifacts/raw/diabetic_data.csv
+      hash: md5
+      md5: 502f0cc004e4cf71536ec2e61596e42f
+      size: 19159383
+    - path: readmit/components/data_ingestion.py
+      hash: md5
+      md5: 99f4038fc57c6521b335efdeab5faa48
+      size: 17858
+    params:
+      params.yaml:
+        data_ingestion.random_state: 42
+        data_ingestion.stratify: true
+        data_ingestion.test_size: 0.2
+    outs:
+    - path: artifacts/processed/real/test.csv
+      hash: md5
+      md5: 4174b50b81e3df5d4cf1351f5cf9e645
+      size: 1763576
+    - path: artifacts/processed/real/train.csv
+      hash: md5
+      md5: c0aa60f1c6205e1641663287dcd22c05
+      size: 7054542
+    - path: artifacts/processed/real_profile.csv
+      hash: md5
+      md5: 912a5a9007895e94dfaebef35479cba9
+      size: 127261
+  data_validation:
+    cmd: python readmit/components/data_validation.py
+    deps:
+    - path: artifacts/processed/real/test.csv
+      hash: md5
+      md5: 4174b50b81e3df5d4cf1351f5cf9e645
+      size: 1763576
+    - path: artifacts/processed/real/train.csv
+      hash: md5
+      md5: c0aa60f1c6205e1641663287dcd22c05
+      size: 7054542
+    - path: readmit/components/data_validation.py
+      hash: md5
+      md5: aa9cf4dfe3c57e45e5868e8d7f2c2b8c
+      size: 59098
+    outs:
+    - path: artifacts/reports/validation_report.json
+      hash: md5
+      md5: d2bbb414cd3c3ff7d2f78c59fe569c37
+      size: 2407
+    - path: artifacts/validated/real/test.csv
+      hash: md5
+      md5: 4174b50b81e3df5d4cf1351f5cf9e645
+      size: 1763576
+    - path: artifacts/validated/real/train.csv
+      hash: md5
+      md5: c0aa60f1c6205e1641663287dcd22c05
+      size: 7054542
+  data_processing:
+    cmd: python readmit/components/new_preprocessing.py
+    deps:
+    - path: artifacts/validated/real/test.csv
+      hash: md5
+      md5: 4174b50b81e3df5d4cf1351f5cf9e645
+      size: 1763576
+    - path: artifacts/validated/real/train.csv
+      hash: md5
+      md5: c0aa60f1c6205e1641663287dcd22c05
+      size: 7054542
+    - path: readmit/components/new_preprocessing.py
+      hash: md5
+      md5: 1bef9fd17aa45279bbd93cc1aa2ff2ff
+      size: 39534
+    - path: readmit/configuration/config.yaml
+      hash: md5
+      md5: e7295b421465899631994e8065a001b1
+      size: 469
+    params:
+      params.yaml:
+        data_processing.apply_smote: true
+        data_processing.handle_outliers: true
+        data_processing.scaler_type: standard
+        data_processing.smote_sampling_strategy: 0.8
+    outs:
+    - path: artifacts/transformed/real/test.csv
+      hash: md5
+      md5: f7f4e7fc4b12ca4c7bd734df283250ea
+      size: 4777940
+    - path: artifacts/transformed/real/train.csv
+      hash: md5
+      md5: 6dc23efebbf274b3ecb4d40c881a1842
+      size: 25703815
+  train_models:
+    cmd: python readmit/components/new_model_training.py
+    deps:
+    - path: artifacts/transformed/real/test.csv
+      hash: md5
+      md5: f7f4e7fc4b12ca4c7bd734df283250ea
+      size: 4777940
+    - path: artifacts/transformed/real/train.csv
+      hash: md5
+      md5: 6dc23efebbf274b3ecb4d40c881a1842
+      size: 25703815
+    - path: readmit/components/new_model_training.py
+      hash: md5
+      md5: 73979c762c696eb97db487dc6bf74364
+      size: 39414
+    outs:
+    - path: artifacts/models/metrics/real_to_real/ensemble_metrics.json
+      hash: md5
+      md5: dfb773fe4ef1059501d617e61d25bbc8
+      size: 401
+    - path: artifacts/models/metrics/real_to_real/lightgbm_metrics.json
+      hash: md5
+      md5: df924e07686100961dc3d22c4a02650c
+      size: 1101
+    - path: 
+        artifacts/models/metrics/real_to_real/logistic_regression_metrics.json
+      hash: md5
+      md5: 4c3aead719d5f666c1aeed603d7cf87a
+      size: 1078
+    - path: artifacts/models/metrics/real_to_real/random_forest_metrics.json
+      hash: md5
+      md5: 4fd904c3df78e1ef010a2851aa1d35ff
+      size: 1091
+    - path: artifacts/models/metrics/real_to_real/xgboost_metrics.json
+      hash: md5
+      md5: eac918939d4bad19cccc7be9f79287a6
+      size: 1121
+    - path: artifacts/models/plots/real_to_real/lightgbm_confusion.png
+      hash: md5
+      md5: c722877bb4418c155fcb82a9cca142c2
+      size: 44022
+    - path: artifacts/models/plots/real_to_real/lightgbm_roc.png
+      hash: md5
+      md5: 5979c8b611bb8262d118690e28e3d7fd
+      size: 66734
+    - path: 
+        artifacts/models/plots/real_to_real/logistic_regression_confusion.png
+      hash: md5
+      md5: 7b4bee0406324819a806f74f04c19771
+      size: 45979
+    - path: artifacts/models/plots/real_to_real/logistic_regression_roc.png
+      hash: md5
+      md5: 2b9c2b3a680fbd3dca84647d3c578c50
+      size: 68519
+    - path: artifacts/models/plots/real_to_real/model_comparison.csv
+      hash: md5
+      md5: 1112fd4bc7d9f8081e3cb84d5dfb4dee
+      size: 752
+    - path: artifacts/models/plots/real_to_real/random_forest_confusion.png
+      hash: md5
+      md5: a8fed0b0b83764ad5dcf7af37d1f2677
+      size: 47144
+    - path: artifacts/models/plots/real_to_real/random_forest_roc.png
+      hash: md5
+      md5: e7912e9c4ed2d5cf504fcdfd38a97fcc
+      size: 67625
+    - path: artifacts/models/plots/real_to_real/xgboost_confusion.png
+      hash: md5
+      md5: 8e17e9a316dcee45814084e4885f4342
+      size: 43857
+    - path: artifacts/models/plots/real_to_real/xgboost_roc.png
+      hash: md5
+      md5: e680472bfc235ab92197969b03513ea5
+      size: 66884
+    - path: artifacts/models/real_to_real/ensemble_model.pkl
+      hash: md5
+      md5: cb0e49ca7de5953a1410acdfee077457
+      size: 15396784
+    - path: artifacts/models/real_to_real/lightgbm.pkl
+      hash: md5
+      md5: fa23650193dc449ecfda004b9622f59f
+      size: 238660
+    - path: artifacts/models/real_to_real/logistic_regression.pkl
+      hash: md5
+      md5: 20c0a464f2a9e897258f402c2d9bc84e
+      size: 4567
+    - path: artifacts/models/real_to_real/random_forest.pkl
+      hash: md5
+      md5: f0cbcc962296e2592f3d1232d89068e5
+      size: 5674041
+    - path: artifacts/models/real_to_real/xgboost.pkl
+      hash: md5
+      md5: ee5b4d6ebbbd058749f4c9288b82d1d1
+      size: 1603306
+  register_models:
+    cmd: python readmit/components/register_all_models.py
+    deps:
+    - path: artifacts/models/metrics/real_to_real/ensemble_metrics.json
+      hash: md5
+      md5: dfb773fe4ef1059501d617e61d25bbc8
+      size: 401
+    - path: artifacts/models/metrics/real_to_real/lightgbm_metrics.json
+      hash: md5
+      md5: df924e07686100961dc3d22c4a02650c
+      size: 1101
+    - path: 
+        artifacts/models/metrics/real_to_real/logistic_regression_metrics.json
+      hash: md5
+      md5: 4c3aead719d5f666c1aeed603d7cf87a
+      size: 1078
+    - path: artifacts/models/metrics/real_to_real/random_forest_metrics.json
+      hash: md5
+      md5: 4fd904c3df78e1ef010a2851aa1d35ff
+      size: 1091
+    - path: artifacts/models/metrics/real_to_real/xgboost_metrics.json
+      hash: md5
+      md5: eac918939d4bad19cccc7be9f79287a6
+      size: 1121
+    - path: artifacts/models/real_to_real/ensemble_model.pkl
+      hash: md5
+      md5: cb0e49ca7de5953a1410acdfee077457
+      size: 15396784
+    - path: artifacts/models/real_to_real/lightgbm.pkl
+      hash: md5
+      md5: fa23650193dc449ecfda004b9622f59f
+      size: 238660
+    - path: artifacts/models/real_to_real/logistic_regression.pkl
+      hash: md5
+      md5: 20c0a464f2a9e897258f402c2d9bc84e
+      size: 4567
+    - path: artifacts/models/real_to_real/random_forest.pkl
+      hash: md5
+      md5: f0cbcc962296e2592f3d1232d89068e5
+      size: 5674041
+    - path: artifacts/models/real_to_real/xgboost.pkl
+      hash: md5
+      md5: ee5b4d6ebbbd058749f4c9288b82d1d1
+      size: 1603306
+    - path: readmit/components/register_all_models.py
+      hash: md5
+      md5: a8d2a66c6ac0ef970948745f5cc77dee
+      size: 2486
+    outs:
+    - path: artifacts/model_registry/registered_models.json
+      hash: md5
+      md5: 59ddec8db1756d51522154ee96c653f3
+      size: 395
+  prepare_serving:
+    cmd: python readmit/components/prepare_serving.py
+    deps:
+    - path: artifacts/model_registry/registered_models.json
+      hash: md5
+      md5: 59ddec8db1756d51522154ee96c653f3
+      size: 395
+    - path: artifacts/models/metrics/real_to_real/ensemble_metrics.json
+      hash: md5
+      md5: dfb773fe4ef1059501d617e61d25bbc8
+      size: 401
+    - path: artifacts/models/metrics/real_to_real/lightgbm_metrics.json
+      hash: md5
+      md5: df924e07686100961dc3d22c4a02650c
+      size: 1101
+    - path: 
+        artifacts/models/metrics/real_to_real/logistic_regression_metrics.json
+      hash: md5
+      md5: 4c3aead719d5f666c1aeed603d7cf87a
+      size: 1078
+    - path: artifacts/models/metrics/real_to_real/random_forest_metrics.json
+      hash: md5
+      md5: 4fd904c3df78e1ef010a2851aa1d35ff
+      size: 1091
+    - path: artifacts/models/metrics/real_to_real/xgboost_metrics.json
+      hash: md5
+      md5: eac918939d4bad19cccc7be9f79287a6
+      size: 1121
+    - path: readmit/components/prepare_serving.py
+      hash: md5
+      md5: 4597161f10b165df8f0cdeceb3ea08f2
+      size: 2089
+    outs:
+    - path: artifacts/serving/metadata
+      hash: md5
+      md5: a2f3224e69c06912e6e47a63f173f711.dir
+      size: 881
+      nfiles: 1
+    - path: artifacts/serving/models
+      hash: md5
+      md5: a6b9d19c8c6236a0dff3ea26db6f23b1.dir
+      size: 22917358
+      nfiles: 5

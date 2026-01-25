@@ -1,0 +1,141 @@
+# ============================================================================
+# DVC PIPELINE - Hospital Readmission Prediction System
+# ============================================================================
+
+stages:
+  # ==========================================================================
+  # STAGE 1: Data Ingestion
+  # ==========================================================================
+  data_ingestion:
+    cmd: python readmit/components/data_ingestion.py 
+    # -c "from readmit.components.data_ingestion import DataIngestion; from readmit.configuration import paths_config; ingestor = DataIngestion(output_dir=paths_config.PROCESSED_DIR); df_real = ingestor.load_data(paths_config.RAW_REAL_DATA_PATH, select_features=False); profile_real, df_real = ingestor.get_data_profile(target_column='readmitted', prefix='real', create_binary_target=True, binary_target_name='readmitted_bin'); df_real = ingestor._apply_feature_selection(df_real); ingestor.split_and_save(df=df_real, target_column='readmitted_bin', data_type='real')"
+
+    deps:
+      - readmit/components/data_ingestion.py
+      - artifacts/raw/diabetic_data.csv
+    params:
+      - data_ingestion.test_size
+      - data_ingestion.random_state
+      - data_ingestion.stratify
+    
+    outs:
+      - artifacts/processed/real/train.csv
+      - artifacts/processed/real/test.csv
+
+    metrics:
+      - artifacts/processed/real_profile.csv:
+          cache: false
+    desc: "Load raw data, create binary target, apply feature selection, and split into train/test"
+
+
+  # ==========================================================================
+  # STAGE 2: Data Validation
+  # ==========================================================================
+  data_validation:
+    cmd: python readmit/components/data_validation.py
+    deps:
+      - readmit/components/data_validation.py
+      - artifacts/processed/real/train.csv
+      - artifacts/processed/real/test.csv
+    outs:
+      - artifacts/validated/real/train.csv
+      - artifacts/validated/real/test.csv
+    metrics:
+      - artifacts/reports/validation_report.json:
+          cache: false
+    desc: "Validate data quality: missing values, outliers, class distribution, and save JSON report"
+
+
+  # ==========================================================================
+  # STAGE 3: Data Processing & Transformation
+  # ==========================================================================
+  data_processing:
+    cmd: python readmit/components/new_preprocessing.py
+    deps:
+      - readmit/components/new_preprocessing.py
+      - artifacts/validated/real/train.csv
+      - artifacts/validated/real/test.csv
+      - readmit/configuration/config.yaml
+    params:
+      - data_processing.scaler_type
+      - data_processing.apply_smote
+      - data_processing.smote_sampling_strategy
+      - data_processing.handle_outliers
+    outs:
+      - artifacts/transformed/real/train.csv
+      - artifacts/transformed/real/test.csv
+    desc: "Apply scaling, SMOTE for class balancing, and feature transformations"
+
+  # ==========================================================================
+  # STAGE 5: Model Training - XGBoost
+  # ==========================================================================
+  train_models:
+    cmd: python readmit/components/new_model_training.py
+    deps:
+      - readmit/components/new_model_training.py
+      - artifacts/transformed/real/train.csv
+      - artifacts/transformed/real/test.csv
+    outs:
+      - artifacts/models/real_to_real/logistic_regression.pkl
+      - artifacts/models/real_to_real/random_forest.pkl
+      - artifacts/models/real_to_real/lightgbm.pkl
+      - artifacts/models/real_to_real/xgboost.pkl
+      - artifacts/models/real_to_real/ensemble_model.pkl
+    plots:
+      - artifacts/models/plots/real_to_real/logistic_regression_roc.png
+      - artifacts/models/plots/real_to_real/logistic_regression_confusion.png
+      - artifacts/models/plots/real_to_real/random_forest_roc.png
+      - artifacts/models/plots/real_to_real/random_forest_confusion.png
+      - artifacts/models/plots/real_to_real/lightgbm_roc.png
+      - artifacts/models/plots/real_to_real/lightgbm_confusion.png
+      - artifacts/models/plots/real_to_real/xgboost_roc.png
+      - artifacts/models/plots/real_to_real/xgboost_confusion.png
+    metrics:
+      - artifacts/models/plots/real_to_real/model_comparison.csv
+      - artifacts/models/metrics/real_to_real/ensemble_metrics.json
+      - artifacts/models/metrics/real_to_real/logistic_regression_metrics.json
+      - artifacts/models/metrics/real_to_real/random_forest_metrics.json
+      - artifacts/models/metrics/real_to_real/lightgbm_metrics.json
+      - artifacts/models/metrics/real_to_real/xgboost_metrics.json
+    desc: "Train all models and save comparison metrics"
+# ==========================================================================
+# STAGE 10: Model Registration (MLflow)
+# ==========================================================================
+  register_models:
+    cmd: python readmit/components/register_all_models.py
+    deps:
+      - readmit/components/register_all_models.py
+      - artifacts/models/real_to_real/logistic_regression.pkl
+      - artifacts/models/real_to_real/random_forest.pkl
+      - artifacts/models/real_to_real/lightgbm.pkl
+      - artifacts/models/real_to_real/xgboost.pkl
+      - artifacts/models/real_to_real/ensemble_model.pkl
+      - artifacts/models/metrics/real_to_real/logistic_regression_metrics.json
+      - artifacts/models/metrics/real_to_real/random_forest_metrics.json
+      - artifacts/models/metrics/real_to_real/lightgbm_metrics.json
+      - artifacts/models/metrics/real_to_real/xgboost_metrics.json
+      - artifacts/models/metrics/real_to_real/ensemble_metrics.json
+    outs:
+      - artifacts/model_registry/registered_models.json:
+          cache: false
+    desc: "Register all trained models into MLflow"
+
+  # ==========================================================================
+  # STAGE 11: Model Serving Preparation
+  # ==========================================================================
+  prepare_serving:
+    cmd: python readmit/components/prepare_serving.py
+    deps:
+      - readmit/components/prepare_serving.py
+      - artifacts/model_registry/registered_models.json
+      - artifacts/models/metrics/real_to_real/logistic_regression_metrics.json
+      - artifacts/models/metrics/real_to_real/random_forest_metrics.json
+      - artifacts/models/metrics/real_to_real/lightgbm_metrics.json
+      - artifacts/models/metrics/real_to_real/xgboost_metrics.json
+      - artifacts/models/metrics/real_to_real/ensemble_metrics.json
+    outs:
+      - artifacts/serving/models:
+          persist: true
+      - artifacts/serving/metadata:
+          persist: true
+    desc: "Prepare serving-ready models and metadata for deployment"

@@ -1,0 +1,159 @@
+# ============================================================================
+# PARAMETERS FILE - Hospital Readmission Prediction System
+# ============================================================================
+# This file contains all hyperparameters and configuration for the DVC pipeline
+# Modify these values to experiment with different settings
+# ============================================================================
+
+# ==========================================================================
+# DATA INGESTION PARAMETERS
+# ==========================================================================
+data_ingestion:
+  test_size: 0.2
+  random_state: 42
+  stratify: true
+  feature_selection_threshold: 0.01  # Variance threshold for feature selection
+
+# ==========================================================================
+# DATA PROCESSING PARAMETERS
+# ==========================================================================
+data_processing:
+  scaler_type: "standard"  # Options: standard, minmax, robust
+  apply_smote: true
+  smote_sampling_strategy: 0.8  # Target ratio of minority to majority class
+  handle_outliers: true
+  outlier_method: "iqr"  # Options: iqr, zscore
+  outlier_threshold: 3.0
+
+# ==========================================================================
+# FEATURE ENGINEERING PARAMETERS
+# ==========================================================================
+feature_engineering:
+  create_interactions: true
+  polynomial_degree: 2
+  max_interaction_features: 50
+
+# ==========================================================================
+# MODEL TRAINING - GLOBAL PARAMETERS
+# ==========================================================================
+train:
+  models:
+    - logistic_regression
+    - lightgbm
+    - random_forest
+    # - xgboost
+  scenario: real_to_real
+  do_hyperparam_tuning: true
+  target_col: readmitted_bin
+  random_state: 42
+  cv_folds: 5
+  scoring_metric: "roc_auc"  # Options: roc_auc, f1, precision, recall
+  
+  # XGBoost Parameters
+  xgboost:
+    n_estimators: 100
+    max_depth: 10
+    learning_rate: 0.1
+    min_child_weight: 1
+    gamma: 0
+    subsample: 0.8
+    colsample_bytree: 0.8
+    reg_alpha: 0
+    reg_lambda: 1
+    scale_pos_weight: 1  # Auto-calculated based on class imbalance
+    objective: "binary:logistic"
+    eval_metric: "logloss"
+  
+  # LightGBM Parameters
+  lightgbm:
+    n_estimators: 100
+    max_depth: 10
+    learning_rate: 0.1
+    num_leaves: 31
+    min_child_samples: 20
+    subsample: 0.8
+    colsample_bytree: 0.8
+    reg_alpha: 0
+    reg_lambda: 0
+    class_weight: "balanced"
+  
+  # Random Forest Parameters
+  random_forest:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 5
+    min_samples_leaf: 2
+    max_features: "sqrt"
+    class_weight: "balanced"
+    bootstrap: true
+  
+  # Logistic Regression Parameters
+  logistic_regression:
+    C: 1.0
+    penalty: "l2"
+    solver: "lbfgs"
+    max_iter: 1000
+    class_weight: "balanced"
+
+# ==========================================================================
+# HYPERPARAMETER TUNING PARAMETERS
+# ==========================================================================
+hyperparameter_tuning:
+  method: "randomized_search"  # Options: grid_search, randomized_search, bayesian
+  n_iter: 20  # Number of iterations for RandomizedSearchCV
+  cv: 5
+  n_jobs: -1
+  verbose: 1
+  
+  # Search spaces for RandomizedSearchCV
+  xgboost_search_space:
+    n_estimators: [50, 100, 200]
+    max_depth: [6, 8, 10, 12]
+    learning_rate: [0.01, 0.05, 0.1, 0.2]
+    min_child_weight: [1, 3, 5]
+    gamma: [0, 0.1, 0.2]
+    subsample: [0.7, 0.8, 0.9]
+    colsample_bytree: [0.7, 0.8, 0.9]
+  
+  lightgbm_search_space:
+    n_estimators: [50, 100, 200]
+    max_depth: [6, 8, 10, 12]
+    learning_rate: [0.01, 0.05, 0.1]
+    num_leaves: [15, 31, 63]
+    min_child_samples: [10, 20, 30]
+  
+  random_forest_search_space:
+    n_estimators: [50, 100, 200]
+    max_depth: [8, 10, 12, 15]
+    min_samples_split: [2, 5, 10]
+    min_samples_leaf: [1, 2, 4]
+
+# ==========================================================================
+# MODEL EVALUATION PARAMETERS
+# ==========================================================================
+evaluation:
+  threshold_tuning: true
+  threshold_metric: "f2"  # Options: f1, f2, precision, recall
+  save_predictions: true
+  save_shap_values: true
+  generate_plots: true
+
+# ==========================================================================
+# MLFLOW PARAMETERS
+# ==========================================================================
+mlflow:
+  tracking_uri: "https://mlflow-server-xxxxx.run.app"  # Update with your MLflow server URL
+  experiment_name: "hospital_readmission"
+  run_name_prefix: "training_run"
+  log_models: true
+  log_artifacts: true
+  registered_model_name: "hospital_readmission_xgboost"
+
+# ==========================================================================
+# DEPLOYMENT PARAMETERS
+# ==========================================================================
+deployment:
+  model_format: "pkl"  # Options: pkl, onnx, tf
+  api_threshold: 0.5
+  batch_size: 32
+  max_predictions_per_request: 1000
