@@ -146,3 +146,4 @@ docs/
 data/
 mlops-sa-key.json
 pipeline.md
+!readmit\components\register_all_models.py
