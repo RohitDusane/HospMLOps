@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import os, sys, time
 import joblib
+import json
 import mlflow
 import mlflow.sklearn
 from sklearn.linear_model import LogisticRegression
@@ -50,21 +51,34 @@ class ModelTrainer:
         self,
         experiment_name: str = "hospital_readmission",
         output_dir: str = paths_config.MODEL_DIR,
-        mlflow_tracking_uri: str = None
+        mlflow_tracking_uri: str | None = None,
     ):
         self.output_dir = output_dir
         self.experiment_name = experiment_name
         os.makedirs(self.output_dir, exist_ok=True)
-        
-        # Setup MLflow
+
+        # ===============================
+        # MLflow configuration (robust)
+        # ===============================
         if mlflow_tracking_uri:
+            # Explicit override (highest priority)
             mlflow.set_tracking_uri(mlflow_tracking_uri)
-        
+            logging.info(f"🔗 MLflow tracking URI set explicitly: {mlflow_tracking_uri}")
+        else:
+            # Use env var if present (Cloud Run / CI / DVC)
+            env_uri = os.getenv("MLFLOW_TRACKING_URI")
+            if env_uri:
+                mlflow.set_tracking_uri(env_uri)
+                logging.info(f"🔗 MLflow tracking URI from env: {env_uri}")
+            else:
+                logging.info("🧪 MLflow using default local tracking")
+
         mlflow.set_experiment(experiment_name)
         logging.info(f"✅ MLflow experiment set | name={experiment_name}")
-        
+
         self.models = {}
         self.results = {}
+
     
     # ==========================================================================
     # 1. DATA LOADING (Unchanged - already optimal)
@@ -490,12 +504,31 @@ class ModelTrainer:
                 train_metrics, _ = self.calculate_metrics(y_train, y_train_pred, y_train_proba)
                 test_metrics, _ = self.calculate_metrics(y_test, y_test_pred, y_test_proba)
 
+                # After computing train_metrics and test_metrics
+                metrics_dir = os.path.join(self.output_dir, "metrics", scenario)
+                os.makedirs(metrics_dir, exist_ok=True)
+
+                metrics_path = os.path.join(metrics_dir, f"{model_name}_metrics.json")
+
+                metrics_to_save = {
+                    "train_metrics": {k: float(v) for k, v in train_metrics.items()},
+                    "test_metrics": {k: float(v) for k, v in test_metrics.items()},
+                    "cv_score": float(best_cv_score) if best_cv_score is not None else None,
+                    "best_params": best_params,  # dict is already JSON-serializable
+                    "best_threshold": float(best_threshold)
+                }
+
+                with open(metrics_path, "w") as f:
+                    json.dump(metrics_to_save, f, indent=2)
+
+                logging.info(f"✅ Metrics saved | path={short_path(metrics_path)}")
+
                 # Log all metrics
                 for k, v in train_metrics.items():
                     mlflow.log_metric(f"train_{k}", v)
                 for k, v in test_metrics.items():
                     mlflow.log_metric(f"test_{k}", v)
-
+                
                 # ===== Save Model =====
                 model_path = os.path.join(self.output_dir, scenario, f"{model_name}.pkl")
                 os.makedirs(os.path.dirname(model_path), exist_ok=True)
@@ -612,7 +645,20 @@ class ModelTrainer:
                 y_proba_ens = ensemble.predict_proba(X_test)[:, 1]
                 metrics_ens, _ = self.calculate_metrics(y_test, y_pred_ens, y_proba_ens)
 
-                # Save ensemble
+                # Save ensemble metrics to JSON
+                ensemble_metrics_dir = os.path.join(self.output_dir, "metrics", scenario)
+                os.makedirs(ensemble_metrics_dir, exist_ok=True)
+
+                ensemble_metrics_path = os.path.join(ensemble_metrics_dir, "ensemble_metrics.json")
+                with open(ensemble_metrics_path, "w") as f:
+                    json.dump(metrics_ens, f, indent=2)
+
+                logging.info(f"✅ Ensemble metrics saved | path={ensemble_metrics_path}")
+
+                # MLFLOW ensemble metrics
+                for k, v in metrics_ens.items():
+                    mlflow.log_metric(f"ensemble_{k}", v)
+                # Save ensemble model
                 ensemble_path = os.path.join(self.output_dir, scenario, "ensemble_model.pkl")
                 os.makedirs(os.path.dirname(ensemble_path), exist_ok=True)
                 joblib.dump(ensemble, ensemble_path)
@@ -745,7 +791,7 @@ class ModelTrainer:
 # ==========================================================================
 # MAIN EXECUTION (OPTIMIZED)
 # ==========================================================================
-if __name__ == "main":
+if __name__ == "__main__":
     start = time.time()
     logging.info("="*70)
     logging.info("🚀 STARTING MODEL TRAINING PIPELINE")
@@ -761,16 +807,14 @@ if __name__ == "main":
         X_train_real, X_test_real, y_train_real, y_test_real = trainer.load_data(
             train_path=paths_config.TRANSFORMED_REAL_TRAIN,
             test_path=paths_config.TRANSFORMED_REAL_TEST,
-            target_col="readmitted_bin"
-        )
+            target_col="readmitted_bin")
         
         results_real = trainer.train_all_models(
             X_train_real, y_train_real, 
             X_test_real, y_test_real, 
             scenario="real_to_real",
             do_hyperparam_tuning=True,
-            n_jobs=1  # ✅ Sequential to avoid nested parallelism
-        )
+            n_jobs=1)
         
         comparison_real = trainer.compare_models(results_real, "real_to_real")
         

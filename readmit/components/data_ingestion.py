@@ -408,26 +408,20 @@ if __name__=='__main__':
         # Load raw data ONCE
         df_real = ingestor.load_data(
             paths_config.RAW_REAL_DATA_PATH,
-            select_features=False
-        )
+            select_features=False)
 
         # Create binary target
         profile_real, df_real = ingestor.get_data_profile(
             target_column="readmitted",
             prefix="real",
             create_binary_target=True,
-            binary_target_name="readmitted_bin"
-        )
+            binary_target_name="readmitted_bin")
 
         # Apply feature selection on SAME df
         df_real = ingestor._apply_feature_selection(df_real)
 
         # Split
-        ingestor.split_and_save(
-            df=df_real,
-            target_column="readmitted_bin",
-            data_type="real"
-        )
+        ingestor.split_and_save(df=df_real, target_column="readmitted_bin", data_type="real")
 
         # -------- SYNTHETIC DATA --------
         # df_syn = ingestor.load_data(

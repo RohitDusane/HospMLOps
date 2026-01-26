@@ -637,43 +637,42 @@ class DataValidation:
         return df
 
     def run(self):
-        """
-        Main validation pipeline for REAL datasets only
-        """
         try:
             # Load processed real datasets
-            logging.info("Loading processed real datasets...")
             self.real_train = self.load_data(paths_config.PROCESSED_REAL_TRAIN)
             self.real_test = self.load_data(paths_config.PROCESSED_REAL_TEST)
 
-            # Validate each real dataset
-            logging.info("Validating data quality for real datasets...")
-
+            # Validate each dataset
             self.validation_report['real_train'] = self.validate_data_quality(
                 self.real_train, "Real Train", "readmitted_bin", dataset_type="real"
             )
-
             self.validation_report['real_test'] = self.validate_data_quality(
                 self.real_test, "Real Test", "readmitted_bin", dataset_type="real"
             )
 
-            # Save validation report
+            # **Save validation report**
             self.save_validation_report()
 
-            logging.info("Validation for real datasets completed successfully.")
+            # ✅ Save the validated datasets (currently missing)
+            validated_train_path = paths_config.VALIDATED_REAL_TRAIN
+            validated_test_path = paths_config.VALIDATED_REAL_TEST
+            self.real_train.to_csv(validated_train_path, index=False)
+            self.real_test.to_csv(validated_test_path, index=False)
+            logging.info(f"Validated real datasets saved: {validated_train_path}, {validated_test_path}")
 
             return {
                 'status': self.validation_report.get('overall_status', True),
                 'report_path': paths_config.VALIDATION_REPORT,
                 'validated_paths': {
-                    'real_train': paths_config.PROCESSED_REAL_TRAIN,
-                    'real_test': paths_config.PROCESSED_REAL_TEST
+                    'real_train': validated_train_path,
+                    'real_test': validated_test_path
                 }
             }
 
         except Exception as e:
             logging.error(f"Error in real data validation: {str(e)}")
             raise CustomException(e, sys)
+
 
 
     # def run(self):

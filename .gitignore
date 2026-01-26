@@ -141,3 +141,8 @@ desktop.ini
 *.tar
 *.tar.gz
 *.rar
+cleanup-gcp.ps1
+docs/
+data/
+mlops-sa-key.json
+pipeline.md
